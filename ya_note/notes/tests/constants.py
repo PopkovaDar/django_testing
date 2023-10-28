@@ -1,5 +1,5 @@
-from django.urls import reverse
 from collections import namedtuple
+from django.urls import reverse
 
 FIELD_NAMES = ('title', 'text', 'slug', 'author')
 FIELD_DATA = ('Заголовок', 'Текст заметки', 'note-slug')

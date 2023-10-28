@@ -1,5 +1,6 @@
-from http import HTTPStatus
 import pytest
+from http import HTTPStatus
+
 from pytest_django.asserts import assertRedirects
 from pytest_lazyfixture import lazy_fixture
 
@@ -22,8 +23,9 @@ pytestmark = pytest.mark.django_db
         (URL.delete, lazy_fixture('admin_client'), HTTPStatus.NOT_FOUND),
     ),
 )
-def test_pages_availability_for_anonymous_user(
+def test_pages_accessibility(
         url, parametrized_client, expected_status, comment):
+    """Проверка доступа к страницам."""
     response = parametrized_client.get(url)
     assert response.status_code == expected_status
 
@@ -33,6 +35,7 @@ def test_pages_availability_for_anonymous_user(
     (URL.edit, URL.delete),
 )
 def test_redirects(client, url, comment):
+    """Проверка редиректа для анонима."""
     expected_url = f'{URL.login}?next={url}'
     response = client.get(url)
     assertRedirects(response, expected_url)

@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from .constants import URL
@@ -16,8 +16,10 @@ class TestDetailPage(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.author = User.objects.create(username=' Лев Толстой')
+        cls.author = User.objects.create(username='Лев Толстой')
         cls.reader = User.objects.create(username='Читатель')
+        cls.author_client = Client()
+        cls.author_client.force_login(cls.author)
         cls.note = Note.objects.create(
             title='Тестовая новость',
             text='Просто текст.',
@@ -28,27 +30,29 @@ class TestDetailPage(TestCase):
             args=(cls.note.slug,)
         )
 
-    def test_anonymous_client_has_no_editform(self):
-        # Проверка что анониму не доступна страница.
-        # редактирования.
+    def test_anonymous_no_access_to_the_edit_form(self):
+        """Проверка что анониму не доступна страница.
+        редактирования.
+        """
         response = self.client.get(self.edit_url)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
-    def test_authorized_client_has_editform(self):
-        # Проверка что автору доступна страница.
-        # редактирования.
-        self.client.force_login(self.author)
-        response = self.client.get(self.edit_url)
+    def test_auyhor_access_to_the_edit_form(self):
+        """Проверка что автору доступна страница.
+        редактирования.
+        """
+        response = self.author_client.get(self.edit_url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_pages_add_form(self):
-        # Проверяет что форма передается на страницу добавления.
-        self.client.force_login(self.author)
-        response = self.client.get(URL.add)
-        self.assertIn('form', response.context)
-
-    def test_pages_edit_form(self):
-        # Проверяет что форма передается на страницу редактирования.
-        self.client.force_login(self.author)
-        response = self.client.get(self.edit_url)
-        self.assertIn('form', response.context)
+    def test_pages_edit_add_form(self):
+        """Проверяет что форма передается на страницы редактирования.
+        и добавления.
+        """
+        urls = [
+            (URL.add, 'страница добавления'),
+            (self.edit_url, 'страница редактирования'),
+        ]
+        for url, page in urls:
+            with self.subTest(page=page):
+                response = self.author_client.get(url)
+                self.assertIn('form', response.context)

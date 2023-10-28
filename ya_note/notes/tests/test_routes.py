@@ -3,8 +3,8 @@ from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 
-from .constants import URL, FIELD_NAMES, FIELD_DATA
 from notes.models import Note
+from .constants import URL, FIELD_NAMES, FIELD_DATA
 
 User = get_user_model()
 
@@ -57,6 +57,7 @@ class TestRoutes(TestCase):
                 )
 
     def test_redirects(self):
+        """Проверка редиректа для неавторизованного пользователя."""
         urls = (
             URL.list,
             URL.add,

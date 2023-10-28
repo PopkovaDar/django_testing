@@ -1,8 +1,9 @@
 import pytest
-from django.urls import reverse
 from collections import namedtuple
-
+from django.conf import settings
+from django.urls import reverse
 from news.models import News, Comment
+from datetime import datetime, timedelta
 
 
 PK = 1
@@ -51,6 +52,33 @@ def news():
 
 
 @pytest.fixture
+def news_count():
+    today = datetime.today()
+    news_count_on_page = News.objects.bulk_create(
+        News(title=f'Новость {index}',
+             text='Просто текст.',
+             date=today - timedelta(days=index),
+             )
+        for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
+    )
+    return news_count_on_page
+
+
+@pytest.fixture
+def comment_sorted_on_page(author, news):
+    today = datetime.today()
+    comment_sorted = Comment.objects.bulk_create(
+        Comment(news=news,
+                author=author,
+                text='Текст комментария',
+                date=today - timedelta(days=index),
+                )
+        for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
+    )
+    return comment_sorted
+
+
+@pytest.fixture
 def url_detail_news(news):
     return reverse('news:detail', args=(news.pk,))
 
@@ -84,9 +112,8 @@ def form_data():
 
 @pytest.fixture
 def comment(author, news):
-    comment = Comment.objects.create(
+    return Comment.objects.create(
         news=news,
         author=author,
         text='Текст комментария',
     )
-    return comment
