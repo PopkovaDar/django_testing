@@ -15,18 +15,14 @@ def test_news_count_on_main(client, news_count):
     assert len(news_list) == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
-def test_news_comment_on_main(client, news, comment_sorted_on_page):
-    """Проверка сортировки комментариев."""
-    response = client.get(URL.detail)
-    assert 'news' in response.context
-    news_detail = response.context['news']
-    all_comments = list(news_detail.comment_set.all())
-    sorted_dates = sorted(
-        all_comments,
-        key=lambda comment: comment.created,
-        reverse=True
-    )
-    assert all_comments == sorted_dates
+def test_news_sorted_on_main(client, comment_sorted_on_page):
+    """Проверка сортировки комментариев на главной."""
+    response = client.get(URL.home)
+    assert 'object_list' in response.context
+    object_list = response.context['object_list']
+    all_dates = [comment.date for comment in object_list]
+    sorted_dates = sorted(all_dates, reverse=True)
+    assert all_dates == sorted_dates
 
 
 def test_news_sorted_on_main(client, news_count):
