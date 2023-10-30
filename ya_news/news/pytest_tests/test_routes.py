@@ -1,11 +1,10 @@
-import pytest
 from http import HTTPStatus
 
+import pytest
 from pytest_django.asserts import assertRedirects
 from pytest_lazyfixture import lazy_fixture
 
 from conftest import URL
-
 
 pytestmark = pytest.mark.django_db
 

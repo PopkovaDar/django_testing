@@ -1,4 +1,5 @@
 from collections import namedtuple
+
 from django.urls import reverse
 
 FIELD_NAMES = ('title', 'text', 'slug', 'author')

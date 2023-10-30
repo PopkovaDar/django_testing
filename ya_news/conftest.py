@@ -71,7 +71,7 @@ def comment_sorted_on_page(author, news):
         Comment(news=news,
                 author=author,
                 text='Текст комментария',
-                date=today - timedelta(days=index),
+                created=today - timedelta(days=index),
                 )
         for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
     )
