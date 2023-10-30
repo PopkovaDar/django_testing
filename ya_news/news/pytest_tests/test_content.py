@@ -15,7 +15,7 @@ def test_news_count_on_main(client, news_count):
     assert len(news_list) == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
-def test_news_sorted_on_main(client, comment_sorted_on_page):
+def test_comment_sorted_on_main(client, comment_sorted_on_page):
     """Проверка сортировки комментариев на главной."""
     response = client.get(URL.home)
     assert 'object_list' in response.context
