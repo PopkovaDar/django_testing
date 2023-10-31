@@ -1,5 +1,7 @@
-import pytest
 from django.conf import settings
+
+import pytest
+from pytest_lazyfixture import lazy_fixture
 
 from conftest import URL
 from news.forms import CommentForm
@@ -49,12 +51,14 @@ def test_anonymous_has_form(admin_client, news):
     assert ('form' in admin_response.context)
 
 
-@pytest.mark.parametrize('client_type', ['client', 'admin_client'])
-def test_comment_form_access(client_type, client, admin_client, news):
-    response = client.get(URL.detail)
-    if client_type == 'client':
+@pytest.mark.parametrize('client_type, forms', [
+    (lazy_fixture('client'), None),
+    (lazy_fixture('admin_client'), 'form')
+])
+def test_comment_form_access(client_type, forms, client, admin_client, news):
+    response = client_type.get(URL.detail)
+    if forms is None:
         assert 'form' not in response.context
     else:
-        response = admin_client.get(URL.detail)
-        assert isinstance(response.context['form'], CommentForm)
-        assert 'form' in response.context
+        assert isinstance(response.context[forms], CommentForm)
+        assert forms in response.context

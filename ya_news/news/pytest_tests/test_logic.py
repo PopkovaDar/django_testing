@@ -67,17 +67,17 @@ def test_other_user_cant_edit_comment(admin_client, form_data, news, comment):
 
 def test_author_can_delete_comment(author_client, form_data, comment):
     """Проверка удаления комментария автором."""
-    after_comment_count = Comment.objects.count()
+    before_comment_count = Comment.objects.count()
     response = author_client.delete(URL.delete, data=form_data)
-    befor_comment_count = Comment.objects.count()
+    after_comment_count = Comment.objects.count()
     assertRedirects(response, f'{URL.detail}#comments')
-    assert befor_comment_count == after_comment_count - 1
+    assert after_comment_count == before_comment_count - 1
 
 
 def test_other_user_cant_delete_comment(admin_client, form_data, comment):
     """Проверка удаления комментария не автором."""
-    after_comment_count = Comment.objects.count()
+    before_comment_count = Comment.objects.count()
     response = admin_client.delete(URL.delete, data=form_data)
-    befor_comment_count = Comment.objects.count()
+    after_comment_count = Comment.objects.count()
     assert response.status_code == HTTPStatus.NOT_FOUND
-    assert after_comment_count == befor_comment_count
+    assert after_comment_count == before_comment_count
