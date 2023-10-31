@@ -37,20 +37,6 @@ def test_news_sorted_on_main(client, news_count):
     assert all_dates == sorted_dates
 
 
-def test_client_has_form(client, news):
-    """Проверка доступности формы комментария для
-    авторизованного пользователя.
-    """
-    response = client.get(URL.detail)
-    assert ('form' not in response.context)
-
-
-def test_anonymous_has_form(admin_client, news):
-    """Проверка доступности формы комментария для анонима."""
-    admin_response = admin_client.get(URL.detail)
-    assert ('form' in admin_response.context)
-
-
 @pytest.mark.parametrize('client_type, forms', [
     (lazy_fixture('client'), None),
     (lazy_fixture('admin_client'), 'form')
