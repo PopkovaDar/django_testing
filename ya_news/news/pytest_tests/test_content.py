@@ -1,7 +1,6 @@
 from django.conf import settings
 
 import pytest
-from pytest_lazyfixture import lazy_fixture
 
 from conftest import URL
 from news.forms import CommentForm
@@ -37,14 +36,15 @@ def test_news_sorted_on_main(client, news_count):
     assert all_dates == sorted_dates
 
 
-@pytest.mark.parametrize('client_type, forms', [
-    (lazy_fixture('client'), None),
-    (lazy_fixture('admin_client'), 'form')
-])
+@pytest.mark.parametrize(
+    ('client_type', 'forms'),
+    [(pytest.lazy_fixture('client'), False),
+     (pytest.lazy_fixture('admin_client'), True)
+     ])
 def test_comment_form_access(client_type, forms, client, admin_client, news):
     response = client_type.get(URL.detail)
-    if forms is None:
-        assert 'form' not in response.context
-    else:
-        assert isinstance(response.context[forms], CommentForm)
-        assert forms in response.context
+    if forms is True:
+        assert isinstance(
+            response.context['form'], CommentForm
+        )
+    assert ('form' in response.context) is forms
